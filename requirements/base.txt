@@ -1,5 +1,6 @@
 Django>=5.0,<5.1
 djangorestframework>=3.18
+requests>=2.32
 psycopg2-binary>=2.9
 celery>=5.4
 redis>=5.0
