@@ -27,6 +27,19 @@ def _eligible_clients_for_inbound(inbound):
     return [c for c in qs if not c.is_over_limit]
 
 
+def build_wireguard_peers(inbound) -> list[dict]:
+    """
+    WireGuard не использует settings.clients[] — вместо этого нужен список
+    peers с публичным ключом и allowedIPs каждого клиента.
+    """
+    clients = _eligible_clients_for_inbound(inbound)
+    return [
+        {"publicKey": c.wg_public_key, "allowedIPs": [c.wg_allowed_ips]}
+        for c in clients
+        if c.wg_public_key and c.wg_allowed_ips
+    ]
+
+
 # ---------------------------------------------------------------------------
 # Xray-core
 # ---------------------------------------------------------------------------

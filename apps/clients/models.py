@@ -33,7 +33,18 @@ class Client(models.Model):
 
     name = models.CharField(max_length=100)
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, help_text="Для vless/vmess")
-    password = models.CharField(max_length=128, blank=True, help_text="Для trojan/shadowsocks")
+    password = models.CharField(max_length=128, blank=True, help_text="Для trojan/shadowsocks/mtproto")
+
+    # WireGuard: клиент как peer нуждается в паре ключей и выделенном IP,
+    # а не в uuid/password.
+    wg_public_key = models.CharField(max_length=64, blank=True, help_text="Публичный ключ WireGuard-пира")
+    wg_private_key = models.CharField(
+        max_length=64, blank=True,
+        help_text="Приватный ключ клиента (хранится для генерации конфига/QR, сам сервер его не использует)",
+    )
+    wg_allowed_ips = models.CharField(
+        max_length=64, blank=True, help_text="Выделенный IP клиента в тоннеле, напр. 10.0.0.2/32"
+    )
 
     traffic_limit_bytes = models.BigIntegerField(null=True, blank=True, help_text="null = безлимит")
     traffic_used_bytes = models.BigIntegerField(default=0)
