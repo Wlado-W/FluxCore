@@ -1,6 +1,10 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+
+from .views import RoutingRuleViewSet
 
 app_name = "routing"
-urlpatterns = [
-    # TODO: маршруты API для routing
-]
+
+router = DefaultRouter()
+router.register(r"", RoutingRuleViewSet, basename="routingrule")
+
+urlpatterns = router.urls
