@@ -14,17 +14,6 @@
 - `templates/`, `static/` — фронтенд панели и тем оформления
 - `locale/` — переводы (ru/en)
 
-## Быстрый старт (dev)
-
-```bash
-cp .env.example .env
-python -m venv venv && source venv/bin/activate
-pip install -r requirements/dev.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
-
 ## Этапы разработки
 
 1. MVP: Node, Inbound, Client, Group, генератор конфигов, install-скрипт, дашборд, подписки
