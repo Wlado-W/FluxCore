@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Дашборд — FluxCore{% endblock %}
+
+{% block content %}
+<section class="summary-cards">
+    <div class="card">
+        <div class="card-value">{{ total_nodes }}</div>
+        <div class="card-label">Всего нод</div>
+    </div>
+    <div class="card card-online">
+        <div class="card-value" id="summary-online">{{ online_nodes }}</div>
+        <div class="card-label">Онлайн</div>
+    </div>
+    <div class="card card-offline">
+        <div class="card-value" id="summary-offline">{{ offline_nodes }}</div>
+        <div class="card-label">Оффлайн</div>
+    </div>
+    <div class="card card-error">
+        <div class="card-value" id="summary-error">{{ error_nodes }}</div>
+        <div class="card-label">Ошибка</div>
+    </div>
+</section>
+
+<section class="nodes-grid" id="nodes-grid">
+    {% for item in nodes_with_metrics %}
+    <div class="node-card" id="node-card-{{ item.node.id }}" data-status="{{ item.node.status }}">
+        <div class="node-card-header">
+            <span class="node-name">{{ item.node.name }}</span>
+            <span class="node-status-badge status-{{ item.node.status }}" id="node-status-{{ item.node.id }}">
+                {{ item.node.get_status_display }}
+            </span>
+        </div>
+        <div class="node-address">{{ item.node.address }}</div>
+        <div class="node-metrics">
+            <div class="metric">
+                <span class="metric-label">CPU</span>
+                <span class="metric-value" id="node-cpu-{{ item.node.id }}">
+                    {% if item.metric %}{{ item.metric.cpu_percent|floatformat:0 }}%{% else %}—{% endif %}
+                </span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">RAM</span>
+                <span class="metric-value" id="node-ram-{{ item.node.id }}">
+                    {% if item.metric %}{{ item.metric.ram_percent|floatformat:0 }}%{% else %}—{% endif %}
+                </span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Диск</span>
+                <span class="metric-value" id="node-disk-{{ item.node.id }}">
+                    {% if item.metric %}{{ item.metric.disk_percent|floatformat:0 }}%{% else %}—{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="node-last-seen" id="node-last-seen-{{ item.node.id }}">
+            {% if item.node.last_seen_at %}Последний отклик: {{ item.node.last_seen_at }}{% else %}Ещё не подключалась{% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p class="empty-state">Нод пока нет. Добавь первую ноду в <a href="/admin/core/node/add/">админке</a>.</p>
+    {% endfor %}
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

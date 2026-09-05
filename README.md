@@ -13,7 +13,7 @@
 - `config/` — настройки Django (settings/base|dev|prod, urls, asgi, celery)
 - `templates/`, `static/` — фронтенд панели и тем оформления
 - `locale/` — переводы (ru/en)
-
+<!--  -->
 ## Этапы разработки
 
 1. MVP: Node, Inbound, Client, Group, генератор конфигов, install-скрипт, дашборд, подписки
