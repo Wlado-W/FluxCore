@@ -114,3 +114,52 @@ body {
 .node-last-seen { color: var(--text-muted); font-size: 12px; }
 
 .empty-state { color: var(--text-muted); grid-column: 1 / -1; text-align: center; padding: 40px 0; }
+
+/* Auth / 2FA */
+.auth-box {
+    max-width: 360px;
+    margin: 60px auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+}
+
+.auth-box h2 { margin-top: 0; font-size: 18px; }
+.auth-hint { color: var(--text-muted); font-size: 13px; }
+.auth-error { color: var(--error); font-size: 13px; }
+.auth-success { color: var(--online); font-size: 14px; }
+
+.auth-box form { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+
+.auth-box input[type="text"],
+.auth-box input[type="password"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.auth-box button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.auth-box button.btn-danger { background: var(--error); }
+
+.qr-image {
+    display: block;
+    width: 200px;
+    height: 200px;
+    margin: 12px auto;
+    background: white;
+    padding: 8px;
+    border-radius: 6px;
+}

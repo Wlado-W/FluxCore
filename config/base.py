@@ -84,7 +84,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 AUTH_USER_MODEL = "accounts.User"
-LOGIN_URL = "/admin/login/"
+LOGIN_URL = "/accounts/login/"
 
 DATABASES = {
     "default": {

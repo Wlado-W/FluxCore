@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Код подтверждения — FluxCore{% endblock %}
+
+{% block content %}
+<div class="auth-box">
+    <h2>Двухфакторная аутентификация</h2>
+    <p class="auth-hint">Введи 6-значный код из приложения-аутентификатора.</p>
+    {% if error %}
+        <p class="auth-error">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <input type="text" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autofocus placeholder="000000">
+        <button type="submit">Подтвердить</button>
+    </form>
+</div>
+{% endblock %}

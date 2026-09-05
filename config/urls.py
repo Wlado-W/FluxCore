@@ -4,6 +4,9 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # Аутентификация (логин/логаут + 2FA)
+    path("accounts/", include("apps.accounts.urls")),
+
     # Панель (дашборд, серверный рендеринг)
     path("", include("apps.core.dashboard_urls")),
 
