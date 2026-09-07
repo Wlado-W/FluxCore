@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Лицензия" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Лицензия" %}</h2>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if license %}
+<div class="card fc-license-card">
+    <div class="card-label">{% trans "Статус" %}</div>
+    <div class="card-value {% if license.is_valid %}text-online{% else %}text-error{% endif %}">
+        {% if license.is_valid %}{% trans "Действительна" %}{% else %}{% trans "Недействительна" %}{% endif %}
+    </div>
+    <table class="fc-kv-table">
+        <tr><td>{% trans "Клиент" %}</td><td>{{ license.customer_name|default:"—" }}</td></tr>
+        <tr><td>{% trans "Лимит нод" %}</td><td>{{ license.max_nodes|default:"∞" }}</td></tr>
+        <tr><td>{% trans "Выдана" %}</td><td>{{ license.issued_at|default:"—" }}</td></tr>
+        {% trans "бессрочно" as forever_label %}
+        <tr><td>{% trans "Истекает" %}</td><td>{{ license.expires_at|default:forever_label }}</td></tr>
+    </table>
+</div>
+{% else %}
+<p class="fc-help-text">{% trans "Лицензия ещё не активирована." %}</p>
+{% endif %}
+
+<div class="form-box" style="margin-top: 24px;">
+    <h2>{% trans "Активировать новую лицензию" %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="fc-field">
+            <label>{{ form.license_key.label }}</label>
+            {{ form.license_key }}
+            {% if form.license_key.errors %}<p class="auth-error">{{ form.license_key.errors|striptags }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn-primary">{% trans "Активировать" %}</button>
+    </form>
+</div>
+{% endblock %}

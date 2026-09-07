@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Отключить 2FA — FluxCore{% endblock %}
+
+{% block content %}
+<div class="auth-box">
+    <h2>Отключить двухфакторную аутентификацию?</h2>
+    <p class="auth-hint">Это снизит защиту твоего аккаунта.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger">Да, отключить</button>
+    </form>
+</div>
+{% endblock %}

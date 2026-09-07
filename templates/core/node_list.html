@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Управление нодами — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Ноды</h2>
+    <a href="{% url 'dashboard:node-create' %}" class="btn-primary">+ Добавить ноду</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Адрес</th>
+            <th>Группа</th>
+            <th>Движки</th>
+            <th>Статус</th>
+            <th>Активна</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for node in nodes %}
+        <tr>
+            <td>{{ node.name }}</td>
+            <td>{{ node.address }}</td>
+            <td>{{ node.group.name|default:"—" }}</td>
+            <td>{{ node.engines_enabled|join:", " }}</td>
+            <td><span class="node-status-badge status-{{ node.status }}">{{ node.get_status_display }}</span></td>
+            <td>{% if node.is_active %}✅{% else %}—{% endif %}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:node-edit' node.pk %}">Изменить</a>
+                <a href="{% url 'dashboard:node-delete' node.pk %}" class="danger-link">Удалить</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">Нод пока нет.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,45 @@
+# Пример CI/CD для обновления агента на всех нодах при пуше в main.
+#
+# Требует secrets в настройках репозитория GitHub:
+#   NODE_HOSTS   — список адресов нод через запятую (напр. "1.2.3.4,5.6.7.8")
+#   SSH_USER     — пользователь для SSH (обычно root)
+#   SSH_PRIVATE_KEY — приватный SSH-ключ с доступом ко всем нодам
+#
+# Это пример/шаблон — адаптируй под свою инфраструктуру (напр. Ansible,
+# или per-node deploy через саму панель, дёргая agent API вместо SSH).
+
+name: Deploy agent to nodes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agent/**"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to each node
+        env:
+          NODE_HOSTS: ${{ secrets.NODE_HOSTS }}
+        run: |
+          IFS=',' read -ra HOSTS <<< "$NODE_HOSTS"
+          for host in "${HOSTS[@]}"; do
+            echo "Deploying to $host..."
+          done
+
+      - name: SSH update on nodes
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.NODE_HOSTS }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/fluxcore-agent
+            git pull origin main
+            ./venv/bin/pip install --quiet -r agent/requirements.txt
+            systemctl restart fluxcore-agent

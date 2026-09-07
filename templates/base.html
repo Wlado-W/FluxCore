@@ -1,0 +1,122 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ active_theme.product_name|default:"FluxCore" }}{% endblock %}</title>
+    {% if active_theme.favicon_url %}<link rel="icon" href="{{ active_theme.favicon_url }}">{% endif %}
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    {% if active_theme %}
+    <style>
+        :root {
+            --bg: {{ active_theme.color_bg }};
+            --surface: {{ active_theme.color_surface }};
+            --border: {{ active_theme.color_border }};
+            --text: {{ active_theme.color_text }};
+            --text-muted: {{ active_theme.color_text_muted }};
+            --accent: {{ active_theme.color_accent }};
+            --online: {{ active_theme.color_online }};
+            --offline: {{ active_theme.color_offline }};
+            --error: {{ active_theme.color_error }};
+        }
+    </style>
+    {% endif %}
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="fc-shell">
+    <aside class="fc-sidebar">
+        <div class="fc-sidebar-brand">
+            {% if active_theme.logo_url %}
+                <img src="{{ active_theme.logo_url }}" alt="{{ active_theme.product_name }}">
+            {% else %}
+                {{ active_theme.product_name|default:"FluxCore" }}
+            {% endif %}
+        </div>
+
+        <nav class="fc-nav">
+            <div class="fc-nav-group">
+                <a href="/" class="fc-nav-link {% if request.path == '/' %}active{% endif %}">
+                    <span class="fc-nav-icon">▦</span> {% trans "Дашборд" %}
+                </a>
+            </div>
+
+            <div class="fc-nav-group">
+                <div class="fc-nav-group-title">{% trans "Инфраструктура" %}</div>
+                <a href="/nodes/manage/" class="fc-nav-link">
+                    <span class="fc-nav-icon">🖧</span> {% trans "Ноды" %}
+                </a>
+                <a href="/admin/inbounds/inbound/" class="fc-nav-link">
+                    <span class="fc-nav-icon">↘</span> {% trans "Входящие" %}
+                </a>
+                <a href="/admin/outbounds/outbound/" class="fc-nav-link">
+                    <span class="fc-nav-icon">↗</span> {% trans "Исходящие" %}
+                </a>
+                <a href="/admin/core/nodegroup/" class="fc-nav-link">
+                    <span class="fc-nav-icon">⛓</span> {% trans "Каскадные серверы" %}
+                </a>
+                <a href="/admin/routing/routingrule/" class="fc-nav-link">
+                    <span class="fc-nav-icon">⇄</span> {% trans "Маршрутизация" %}
+                </a>
+            </div>
+
+            <div class="fc-nav-group">
+                <div class="fc-nav-group-title">{% trans "Клиенты" %}</div>
+                <a href="/admin/clients/client/" class="fc-nav-link">
+                    <span class="fc-nav-icon">👤</span> {% trans "Клиенты" %}
+                </a>
+                <a href="/admin/clients/clientgroup/" class="fc-nav-link">
+                    <span class="fc-nav-icon">👥</span> {% trans "Группы клиентов" %}
+                </a>
+                <a href="/admin/billing/tariff/" class="fc-nav-link">
+                    <span class="fc-nav-icon">💳</span> {% trans "Тарифы и биллинг" %}
+                </a>
+            </div>
+
+            <div class="fc-nav-group">
+                <div class="fc-nav-group-title">{% trans "Мониторинг" %}</div>
+                <a href="/#nodes-map" class="fc-nav-link">
+                    <span class="fc-nav-icon">🗺</span> {% trans "Карта нод" %}
+                </a>
+                <a href="/admin/audit/auditlog/" class="fc-nav-link">
+                    <span class="fc-nav-icon">📋</span> {% trans "Аудит-лог" %}
+                </a>
+            </div>
+
+            <div class="fc-nav-group">
+                <div class="fc-nav-group-title">{% trans "Настройки" %}</div>
+                <a href="{% url 'licensing:status' %}" class="fc-nav-link {% if request.path == '/license/' %}active{% endif %}">
+                    <span class="fc-nav-icon">🔑</span> {% trans "Лицензия" %}
+                </a>
+                <a href="/admin/panel_settings/theme/" class="fc-nav-link">
+                    <span class="fc-nav-icon">🎨</span> {% trans "Темы оформления" %}
+                </a>
+                <a href="{% url 'accounts:setup_2fa' %}" class="fc-nav-link">
+                    <span class="fc-nav-icon">🛡</span> {% trans "Безопасность (2FA)" %}
+                </a>
+                <a href="/admin/" class="fc-nav-link">
+                    <span class="fc-nav-icon">⚙</span> {% trans "Полная админка" %}
+                </a>
+            </div>
+        </nav>
+
+        <div class="fc-sidebar-footer">
+            <form action="{% url 'set_language' %}" method="post" class="fc-lang-switch">
+                {% csrf_token %}
+                <input name="next" type="hidden" value="{{ request.path }}">
+                <button type="submit" name="language" value="ru" class="fc-lang-btn {% if LANGUAGE_CODE == 'ru' %}active{% endif %}">RU</button>
+                <button type="submit" name="language" value="en" class="fc-lang-btn {% if LANGUAGE_CODE == 'en' %}active{% endif %}">EN</button>
+            </form>
+            {% if user.is_authenticated %}
+            <a href="/accounts/logout/" class="fc-nav-link">↪ {% trans "Выйти" %}</a>
+            {% endif %}
+        </div>
+    </aside>
+
+    <main class="fc-main">
+        {% block content %}{% endblock %}
+    </main>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
