@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if is_edit %}{% trans "Изменить outbound" %}{% else %}{% trans "Новый outbound" %}{% endif %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box form-box-wide">
+    <h2>{% if is_edit %}{% trans "Изменить outbound" %} «{{ outbound.tag }}»{% else %}{% trans "Новый outbound" %}{% endif %}</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="fc-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p class="auth-error">{{ field.errors|striptags }}</p>{% endif %}
+            {% if field.help_text %}<p class="fc-help-text">{{ field.help_text }}</p>{% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{% if is_edit %}{% trans "Сохранить" %}{% else %}{% trans "Создать" %}{% endif %}</button>
+            <a href="{% url 'dashboard:outbound-list' %}" class="btn-secondary">{% trans "Отмена" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

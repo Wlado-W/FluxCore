@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Исходящие" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Исходящие (Outbounds)" %}</h2>
+    <a href="{% url 'dashboard:outbound-create' %}" class="btn-primary">+ {% trans "Добавить outbound" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Тег" %}</th>
+            <th>{% trans "Нода" %}</th>
+            <th>{% trans "Протокол" %}</th>
+            <th>{% trans "Каскад →" %}</th>
+            <th>{% trans "Balancer" %}</th>
+            <th>{% trans "Активен" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for outbound in outbounds %}
+        <tr>
+            <td>{{ outbound.tag }}</td>
+            <td>{{ outbound.node.name }}</td>
+            <td>{{ outbound.get_protocol_display }}</td>
+            <td>{% if outbound.target_node %}{{ outbound.target_node.name }} ({{ outbound.target_inbound_tag }}){% else %}—{% endif %}</td>
+            <td>{{ outbound.balancer_tag|default:"—" }}</td>
+            <td>{% if outbound.is_active %}✅{% else %}—{% endif %}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:outbound-edit' outbound.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:outbound-delete' outbound.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">{% trans "Исходящих пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

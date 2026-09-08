@@ -352,3 +352,23 @@ body {
     .fc-sidebar { width: 100%; height: auto; position: relative; }
     .fc-main { padding: 16px; }
 }
+
+/* ---- Inbound CRUD дополнения ---- */
+
+.form-box-wide { max-width: 720px; }
+
+.fc-json-input {
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 13px;
+}
+
+input[type="checkbox"] { width: auto; margin-right: 6px; }
+
+.test-result { margin-left: 8px; font-size: 13px; }
+.test-success { color: var(--online); }
+.test-error { color: var(--error); }
+
+.btn-secondary.btn-test {
+    padding: 4px 10px;
+    font-size: 12px;
+}

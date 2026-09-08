@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Маршрутизация" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Правила маршрутизации" %}</h2>
+    <a href="{% url 'dashboard:routingrule-create' %}" class="btn-primary">+ {% trans "Добавить правило" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Приоритет" %}</th>
+            <th>{% trans "Название" %}</th>
+            <th>{% trans "Нода" %}</th>
+            <th>{% trans "Тип условия" %}</th>
+            <th>{% trans "Значения" %}</th>
+            <th>{% trans "Куда ведёт" %}</th>
+            <th>{% trans "Активно" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for rule in rules %}
+        <tr>
+            <td>{{ rule.priority }}</td>
+            <td>{{ rule.name }}</td>
+            <td>{{ rule.node.name }}</td>
+            <td>{{ rule.get_match_type_display }}</td>
+            <td>{{ rule.match_values|join:", " }}</td>
+            <td>{% if rule.target_outbound %}{{ rule.target_outbound.tag }}{% else %}{{ rule.target_balancer_tag }}{% endif %}</td>
+            <td>{% if rule.is_active %}✅{% else %}—{% endif %}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:routingrule-edit' rule.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:routingrule-delete' rule.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="empty-state">{% trans "Правил пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

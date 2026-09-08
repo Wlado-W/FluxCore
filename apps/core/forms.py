@@ -39,3 +39,18 @@ class NodeForm(forms.ModelForm):
             "longitude": forms.NumberInput(attrs={"class": "fc-input", "step": "any"}),
             "group": forms.Select(attrs={"class": "fc-select"}),
         }
+
+
+class NodeGroupForm(forms.ModelForm):
+    class Meta:
+        model = NodeGroup
+        fields = ["name", "description", "is_cascade"]
+        labels = {
+            "name": "Название группы",
+            "description": "Описание",
+            "is_cascade": "Это каскад (ноды связаны цепочкой)",
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "fc-input"}),
+            "description": forms.Textarea(attrs={"class": "fc-input", "rows": 3}),
+        }
