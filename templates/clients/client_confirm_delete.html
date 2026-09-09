@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Удалить клиента" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>{% trans "Удалить клиента" %} «{{ client.name }}»?</h2>
+    <p class="fc-help-text">{% trans "Подписка и история платежей этого клиента тоже будут затронуты." %}</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">{% trans "Да, удалить" %}</button>
+            <a href="{% url 'dashboard:client-list' %}" class="btn-secondary">{% trans "Отмена" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

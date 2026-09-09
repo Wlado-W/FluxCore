@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Тарифы" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Тарифы" %}</h2>
+    <a href="{% url 'dashboard:tariff-create' %}" class="btn-primary">+ {% trans "Добавить тариф" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Название" %}</th>
+            <th>{% trans "Цена" %}</th>
+            <th>{% trans "Срок" %}</th>
+            <th>{% trans "Лимит трафика" %}</th>
+            <th>{% trans "Устройств" %}</th>
+            <th>{% trans "Активен" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tariff in tariffs %}
+        <tr>
+            <td>{{ tariff.name }}</td>
+            <td>{{ tariff.price }} {{ tariff.currency }}</td>
+            <td>{% if tariff.duration_days %}{{ tariff.duration_days }} {% trans "дн." %}{% else %}{% trans "бессрочно" %}{% endif %}</td>
+            <td>{% if tariff.traffic_limit_bytes %}{{ tariff.traffic_limit_bytes|filesizeformat }}{% else %}∞{% endif %}</td>
+            <td>{{ tariff.max_devices|default:"∞" }}</td>
+            <td>{% if tariff.is_active %}✅{% else %}—{% endif %}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:tariff-edit' tariff.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:tariff-delete' tariff.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">{% trans "Тарифов пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

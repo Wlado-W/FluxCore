@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Группы клиентов" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Группы клиентов" %}</h2>
+    <a href="{% url 'dashboard:clientgroup-create' %}" class="btn-primary">+ {% trans "Добавить группу" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Название" %}</th>
+            <th>{% trans "Inbound'ы" %}</th>
+            <th>{% trans "Клиентов в группе" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>{{ group.inbounds.count }}</td>
+            <td>{{ group.clients.count }}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:clientgroup-edit' group.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:clientgroup-delete' group.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state">{% trans "Групп пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Удалить группу" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>{% trans "Удалить группу" %} «{{ group.name }}»?</h2>
+    <p class="fc-help-text">{% trans "Удаление невозможно, если в группе есть клиенты (защита PROTECT)." %}</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">{% trans "Да, удалить" %}</button>
+            <a href="{% url 'dashboard:clientgroup-list' %}" class="btn-secondary">{% trans "Отмена" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
