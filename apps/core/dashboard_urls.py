@@ -1,10 +1,13 @@
 from django.urls import path
 
+from apps.accounts import user_views
 from apps.audit import views as audit_views
-from apps.billing import tariff_views
+from apps.billing import promo_views, tariff_views
 from apps.clients import clientgroup_views, views as client_views
 from apps.inbounds import views as inbound_views
 from apps.outbounds import views as outbound_views
+from apps.panel_settings import views as theme_views
+from apps.resellers import profile_views as reseller_profile_views
 from apps.routing import views as routing_views
 
 from . import node_views, nodegroup_views, views
@@ -56,6 +59,30 @@ urlpatterns = [
     path("tariffs/manage/<int:pk>/edit/", tariff_views.tariff_edit_view, name="tariff-edit"),
     path("tariffs/manage/<int:pk>/delete/", tariff_views.tariff_delete_view, name="tariff-delete"),
 
-    # Аудит-лог (read-only, без Django admin)
+    # Кастомный CRUD для промокодов (без Django admin)
+    path("promocodes/manage/", promo_views.promocode_list_view, name="promocode-list"),
+    path("promocodes/manage/create/", promo_views.promocode_create_view, name="promocode-create"),
+    path("promocodes/manage/<int:pk>/edit/", promo_views.promocode_edit_view, name="promocode-edit"),
+    path("promocodes/manage/<int:pk>/delete/", promo_views.promocode_delete_view, name="promocode-delete"),
+
     path("audit/", audit_views.auditlog_list_view, name="auditlog-list"),
+
+    path("themes/manage/", theme_views.theme_list_view, name="theme-list"),
+    path("themes/manage/create/", theme_views.theme_create_view, name="theme-create"),
+    path("themes/manage/<int:pk>/edit/", theme_views.theme_edit_view, name="theme-edit"),
+    path("themes/manage/<int:pk>/delete/", theme_views.theme_delete_view, name="theme-delete"),
+    path("themes/manage/<int:pk>/activate/", theme_views.theme_activate_view, name="theme-activate"),
+
+    # Кастомный CRUD для реселлерских профилей (без Django admin)
+    path("resellers/manage/", reseller_profile_views.resellerprofile_list_view, name="resellerprofile-list"),
+    path("resellers/manage/create/", reseller_profile_views.resellerprofile_create_view, name="resellerprofile-create"),
+    path("resellers/manage/<int:pk>/edit/", reseller_profile_views.resellerprofile_edit_view, name="resellerprofile-edit"),
+    path("resellers/manage/<int:pk>/delete/", reseller_profile_views.resellerprofile_delete_view, name="resellerprofile-delete"),
+    path("resellers/manage/<int:pk>/approve/", reseller_profile_views.resellerprofile_approve_view, name="resellerprofile-approve"),
+
+    # Кастомный CRUD для пользователей (без Django admin)
+    path("users/manage/", user_views.user_list_view, name="user-list"),
+    path("users/manage/create/", user_views.user_create_view, name="user-create"),
+    path("users/manage/<int:pk>/edit/", user_views.user_edit_view, name="user-edit"),
+    path("users/manage/<int:pk>/delete/", user_views.user_delete_view, name="user-delete"),
 ]

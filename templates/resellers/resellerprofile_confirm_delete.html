@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Удалить профиль" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>{% trans "Удалить профиль" %} «{{ profile.user.username }}»?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">{% trans "Да, удалить" %}</button>
+            <a href="{% url 'dashboard:resellerprofile-list' %}" class="btn-secondary">{% trans "Отмена" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

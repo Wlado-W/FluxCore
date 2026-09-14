@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Удалить промокод" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>{% trans "Удалить промокод" %} «{{ promocode.code }}»?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">{% trans "Да, удалить" %}</button>
+            <a href="{% url 'dashboard:promocode-list' %}" class="btn-secondary">{% trans "Отмена" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

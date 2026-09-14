@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Промокоды" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Промокоды" %}</h2>
+    <a href="{% url 'dashboard:promocode-create' %}" class="btn-primary">+ {% trans "Добавить промокод" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Код" %}</th>
+            <th>{% trans "Скидка" %}</th>
+            <th>{% trans "Использован" %}</th>
+            <th>{% trans "Действует до" %}</th>
+            <th>{% trans "Активен" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for promo in promocodes %}
+        <tr>
+            <td>{{ promo.code }}</td>
+            <td>{% if promo.discount_type == "percent" %}{{ promo.discount_value }}%{% else %}{{ promo.discount_value }}{% endif %}</td>
+            <td>{{ promo.used_count }}{% if promo.max_uses %} / {{ promo.max_uses }}{% endif %}</td>
+            <td>{{ promo.valid_until|default:"—" }}</td>
+            <td>{% if promo.is_active %}✅{% else %}—{% endif %}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:promocode-edit' promo.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:promocode-delete' promo.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-state">{% trans "Промокодов пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

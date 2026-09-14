@@ -72,6 +72,16 @@
                 <a href="/tariffs/manage/" class="fc-nav-link">
                     <span class="fc-nav-icon">💳</span> {% trans "Тарифы и биллинг" %}
                 </a>
+                <a href="/promocodes/manage/" class="fc-nav-link">
+                    <span class="fc-nav-icon">🏷</span> {% trans "Промокоды" %}
+                </a>
+            </div>
+
+            <div class="fc-nav-group">
+                <div class="fc-nav-group-title">{% trans "Реселлеры" %}</div>
+                <a href="/resellers/manage/" class="fc-nav-link">
+                    <span class="fc-nav-icon">🤝</span> {% trans "Реселлерские профили" %}
+                </a>
             </div>
 
             <div class="fc-nav-group">
@@ -86,10 +96,13 @@
 
             <div class="fc-nav-group">
                 <div class="fc-nav-group-title">{% trans "Настройки" %}</div>
+                <a href="/users/manage/" class="fc-nav-link">
+                    <span class="fc-nav-icon">🧑‍💻</span> {% trans "Пользователи" %}
+                </a>
                 <a href="{% url 'licensing:status' %}" class="fc-nav-link {% if request.path == '/license/' %}active{% endif %}">
                     <span class="fc-nav-icon">🔑</span> {% trans "Лицензия" %}
                 </a>
-                <a href="/admin/panel_settings/theme/" class="fc-nav-link">
+                <a href="/themes/manage/" class="fc-nav-link">
                     <span class="fc-nav-icon">🎨</span> {% trans "Темы оформления" %}
                 </a>
                 <a href="{% url 'accounts:setup_2fa' %}" class="fc-nav-link">

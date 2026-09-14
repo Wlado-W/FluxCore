@@ -15,26 +15,25 @@
 </div>
 {% endif %}
 
-{% if license %}
+{% if token %}
 <div class="card fc-license-card">
-    <div class="card-label">{% trans "Статус" %}</div>
-    <div class="card-value {% if license.is_valid %}text-online{% else %}text-error{% endif %}">
-        {% if license.is_valid %}{% trans "Действительна" %}{% else %}{% trans "Недействительна" %}{% endif %}
+    <div class="card-label">{% trans "Токен активации" %}</div>
+    <div class="card-value {% if token_is_valid %}text-online{% else %}text-error{% endif %}">
+        {% if token_is_valid %}{% trans "Действителен" %}{% else %}{% trans "Истёк" %}{% endif %}
     </div>
     <table class="fc-kv-table">
-        <tr><td>{% trans "Клиент" %}</td><td>{{ license.customer_name|default:"—" }}</td></tr>
-        <tr><td>{% trans "Лимит нод" %}</td><td>{{ license.max_nodes|default:"∞" }}</td></tr>
-        <tr><td>{% trans "Выдана" %}</td><td>{{ license.issued_at|default:"—" }}</td></tr>
-        {% trans "бессрочно" as forever_label %}
-        <tr><td>{% trans "Истекает" %}</td><td>{{ license.expires_at|default:forever_label }}</td></tr>
+        <tr><td>{% trans "Лимит нод" %}</td><td>{{ token.max_nodes|default:"∞" }}</td></tr>
+        <tr><td>{% trans "Выдан" %}</td><td>{{ token.issued_at }}</td></tr>
+        <tr><td>{% trans "Истекает" %}</td><td>{{ token.expires_at }}</td></tr>
     </table>
+    <p class="fc-help-text">{% trans "Токен продлевается автоматически раз в 12 часов, пока сервер лицензий продавца доступен." %}</p>
 </div>
 {% else %}
 <p class="fc-help-text">{% trans "Лицензия ещё не активирована." %}</p>
 {% endif %}
 
 <div class="form-box" style="margin-top: 24px;">
-    <h2>{% trans "Активировать новую лицензию" %}</h2>
+    <h2>{% trans "Активировать лицензию" %}</h2>
     <form method="post">
         {% csrf_token %}
         <div class="fc-field">

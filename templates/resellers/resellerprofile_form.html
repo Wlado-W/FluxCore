@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if is_edit %}{% trans "Изменить профиль" %}{% else %}{% trans "Новый профиль" %}{% endif %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>{% if is_edit %}{% trans "Изменить профиль" %} «{{ profile.user.username }}»{% else %}{% trans "Новый реселлерский профиль" %}{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="fc-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p class="auth-error">{{ field.errors|striptags }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">{% if is_edit %}{% trans "Сохранить" %}{% else %}{% trans "Создать" %}{% endif %}</button>
+            <a href="{% url 'dashboard:resellerprofile-list' %}" class="btn-secondary">{% trans "Отмена" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

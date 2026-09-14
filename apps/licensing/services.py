@@ -1,14 +1,17 @@
 """
-Сервисные функции лицензирования: активация ключа, получение текущей
-активной лицензии, проверка лимита нод.
+Сервисные функции лицензирования: активация ключа через удалённый сервер
+лицензий продавца (не офлайн-проверка внутри самой панели!), проверка
+лимита нод, получение текущего действующего токена.
 """
 import os
-from datetime import datetime
+from datetime import datetime, timezone as dt_timezone
 
+import requests
 from django.utils import timezone
 
 from .crypto import LicenseSignatureError, verify_license
-from .models import License
+from .hardware import get_hardware_fingerprint
+from .models import License, RemoteActivationToken
 
 
 class LicenseError(Exception):
@@ -22,80 +25,98 @@ class LicenseLimitExceeded(LicenseError):
 def _get_public_key() -> str:
     key = os.environ.get("LICENSING_PUBLIC_KEY")
     if not key:
-        raise LicenseError("LICENSING_PUBLIC_KEY не задан в .env — панель не может проверять лицензии.")
+        raise LicenseError("LICENSING_PUBLIC_KEY не задан в .env.")
     return key
 
 
-def activate_license(license_key: str) -> License:
-    """Проверяет подпись ключа и сохраняет его как активную лицензию."""
-    public_key = _get_public_key()
+def _get_license_server_url() -> str:
+    url = os.environ.get("LICENSE_SERVER_URL")
+    if not url:
+        raise LicenseError("LICENSE_SERVER_URL не задан в .env — панель не знает, куда обращаться за активацией.")
+    return url.rstrip("/")
+
+
+def fetch_remote_token(license_key: str, timeout: int = 10) -> RemoteActivationToken:
+    """
+    Обращается к серверу лицензий продавца за коротким подписанным
+    токеном активации. Бросает LicenseError, если сервер недоступен,
+    ключ отозван, или подпись ответа не проходит проверку.
+    """
+    server_url = _get_license_server_url()
+    fingerprint = get_hardware_fingerprint()
 
     try:
-        payload = verify_license(license_key, public_key)
+        response = requests.post(
+            f"{server_url}/v1/activate",
+            json={"license_key": license_key, "hardware_fingerprint": fingerprint},
+            timeout=timeout,
+        )
+    except requests.RequestException as exc:
+        raise LicenseError(f"Сервер лицензий недоступен: {exc}") from exc
+
+    if response.status_code != 200:
+        detail = response.json().get("detail", "Неизвестная ошибка") if response.content else "Нет ответа"
+        raise LicenseError(f"Отказ в активации: {detail}")
+
+    data = response.json()
+    token_str = data["token"]
+
+    try:
+        payload = verify_license(token_str, _get_public_key())
     except LicenseSignatureError as exc:
-        raise LicenseError(str(exc)) from exc
+        raise LicenseError(f"Подпись токена от сервера лицензий недействительна: {exc}") from exc
 
-    expires_at = None
-    if payload.get("expires_at"):
-        expires_at = datetime.fromisoformat(payload["expires_at"])
-        if timezone.is_naive(expires_at):
-            expires_at = timezone.make_aware(expires_at)
+    if payload.get("hardware_fingerprint") != fingerprint:
+        raise LicenseError("Токен выдан для другого сервера (несовпадение отпечатка железа).")
 
-    issued_at = None
-    if payload.get("issued_at"):
-        issued_at = datetime.fromisoformat(payload["issued_at"])
-        if timezone.is_naive(issued_at):
-            issued_at = timezone.make_aware(issued_at)
+    issued_at = datetime.fromtimestamp(payload["issued_at"], tz=dt_timezone.utc)
+    expires_at = datetime.fromtimestamp(payload["expires_at"], tz=dt_timezone.utc)
 
-    is_valid = expires_at is None or expires_at > timezone.now()
-
-    # Деактивируем предыдущие лицензии — активна только последняя
-    License.objects.update(is_valid=False)
-
-    return License.objects.create(
-        key=license_key,
-        customer_name=payload.get("customer", ""),
-        max_nodes=payload.get("max_nodes"),
-        issued_at=issued_at,
-        expires_at=expires_at,
-        is_valid=is_valid,
+    # Храним только один актуальный токен — старые больше не нужны
+    RemoteActivationToken.objects.all().delete()
+    return RemoteActivationToken.objects.create(
+        token=token_str, max_nodes=payload.get("max_nodes"), issued_at=issued_at, expires_at=expires_at,
     )
 
 
-def get_active_license() -> License | None:
-    return License.objects.filter(is_valid=True).order_by("-activated_at").first()
+def activate_license(license_key: str) -> License:
+    """Сохраняет ключ и сразу же получает первый токен активации у сервера продавца."""
+    fetch_remote_token(license_key)  # бросит LicenseError, если ключ невалиден/отозван
+    License.objects.all().delete()  # одна лицензия на инсталляцию
+    return License.objects.create(key=license_key)
 
 
-def revalidate_active_license() -> License | None:
+def get_current_license() -> License | None:
+    return License.objects.order_by("-activated_at").first()
+
+
+def has_valid_remote_token() -> bool:
+    """Используется middleware — есть ли действующий, не просроченный токен."""
+    token = RemoteActivationToken.objects.order_by("-fetched_at").first()
+    if token is None:
+        return False
+    return token.expires_at > timezone.now()
+
+
+def refresh_token_if_needed() -> None:
     """
-    Периодически (или при каждом критичном действии) перепроверяет срок
-    действия текущей лицензии — на случай истечения времени без переактивации.
+    Вызывается периодической Celery-задачей — продлевает токен заранее,
+    пока текущий ещё не истёк, чтобы админ не видел разрывов в работе.
+    Если сервер лицензий недоступен — токен просто не обновится и
+    доступ заблокируется, когда истечёт текущий (см. middleware).
     """
-    license_obj = License.objects.order_by("-activated_at").first()
+    license_obj = get_current_license()
     if license_obj is None:
-        return None
-
-    is_valid = license_obj.expires_at is None or license_obj.expires_at > timezone.now()
-    if is_valid != license_obj.is_valid:
-        license_obj.is_valid = is_valid
-        license_obj.save(update_fields=["is_valid", "last_checked_at"])
-    else:
-        license_obj.save(update_fields=["last_checked_at"])
-
-    return license_obj
+        return
+    try:
+        fetch_remote_token(license_obj.key)
+    except LicenseError:
+        pass  # тихо игнорируем — middleware сам заблокирует доступ при истечении
 
 
 def check_node_limit(current_node_count: int) -> None:
-    """Бросает LicenseLimitExceeded, если создание ещё одной ноды превысит лимит лицензии."""
-    license_obj = get_active_license()
-
-    if license_obj is None:
-        raise LicenseLimitExceeded(
-            "Нет действующей лицензии. Активируй лицензионный ключ в /admin/licensing/license/."
-        )
-
-    if license_obj.max_nodes is not None and current_node_count >= license_obj.max_nodes:
-        raise LicenseLimitExceeded(
-            f"Достигнут лимит нод по лицензии ({license_obj.max_nodes}). "
-            "Обратись к продавцу для расширения лицензии."
-        )
+    token = RemoteActivationToken.objects.order_by("-fetched_at").first()
+    if token is None or token.expires_at <= timezone.now():
+        raise LicenseLimitExceeded("Нет действующего токена активации. Зайди в /license/ для активации.")
+    if token.max_nodes is not None and current_node_count >= token.max_nodes:
+        raise LicenseLimitExceeded(f"Достигнут лимит нод по лицензии ({token.max_nodes}).")
