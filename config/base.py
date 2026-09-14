@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "apps.licensing",
     "apps.panel_settings",
     "apps.client_portal",
+    "apps.updates",
 ]
 
 MIDDLEWARE = [
@@ -58,9 +59,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.audit.middleware.AuditLogMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "apps.audit.middleware.AuditLogMiddleware",
+    
 ]
 
 ROOT_URLCONF = "config.urls"

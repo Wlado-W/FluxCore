@@ -7,12 +7,22 @@ RemoteActivationToken хранит короткоживущий токен, по
 или нет (см. apps/licensing/middleware.py).
 """
 from django.db import models
-
+from django.utils import timezone
 
 class License(models.Model):
     key = models.TextField(help_text="Лицензионный ключ, введённый администратором")
     customer_name = models.CharField(max_length=255, blank=True)
     activated_at = models.DateTimeField(auto_now_add=True)
+    max_nodes = models.IntegerField(default=1)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+
+    # Динамическое свойство is_valid
+    @property
+    def is_valid(self):
+        if self.expires_at and self.expires_at < timezone.now():
+            return False
+        return True
 
     class Meta:
         ordering = ["-activated_at"]
@@ -30,7 +40,7 @@ class RemoteActivationToken(models.Model):
     """
     token = models.TextField()
     max_nodes = models.PositiveIntegerField(null=True, blank=True)
-    issued_at = models.DateTimeField()
+    issued_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата выдачи")
     expires_at = models.DateTimeField()
     fetched_at = models.DateTimeField(auto_now=True)
 

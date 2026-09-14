@@ -9,6 +9,7 @@ from django.db import models
 
 from apps.core.models import Node
 from apps.outbounds.models import Outbound
+from django.core.exceptions import ValidationError
 
 
 class RoutingRule(models.Model):
@@ -54,6 +55,16 @@ class RoutingRule(models.Model):
         return f"{self.name} @ {self.node.name} (prio {self.priority})"
 
     def clean(self):
-        from django.core.exceptions import ValidationError
+        super().clean()
+        
         if not self.target_outbound and not self.target_balancer_tag:
             raise ValidationError("Нужно указать либо target_outbound, либо target_balancer_tag.")
+        # Предотвращение прямых закольцовываний на ту же ноду
+        if self.target_outbound and self.target_outbound.target_node == self.node:
+            raise ValidationError(
+                "Правило маршрутизации создаст цикл: выбранный Outbound направляет трафик обратно на эту же ноду."
+            )
+        
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)

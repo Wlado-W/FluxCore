@@ -6,7 +6,7 @@ from apps.billing import promo_views, tariff_views
 from apps.clients import clientgroup_views, views as client_views
 from apps.inbounds import views as inbound_views
 from apps.outbounds import views as outbound_views
-from apps.panel_settings import views as theme_views
+import apps.panel_settings.views as theme_views
 from apps.resellers import profile_views as reseller_profile_views
 from apps.routing import views as routing_views
 
