@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}О программе — {{ branding.app_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>О программе</h2>
+</div>
+
+<div class="form-box">
+    <table class="fc-table">
+        <tbody>
+            <tr><th>Продукт</th><td>{{ about.app_name }}</td></tr>
+            <tr><th>Версия</th><td>{{ about.version }}</td></tr>
+            <tr><th>Статус лицензии</th>
+                <td>
+                    {% if about.license.status == "Active" %}
+                        <span class="node-status-badge status-online">Активна</span>
+                    {% else %}
+                        <span class="node-status-badge status-offline">Неактивна</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr><th>Тариф</th><td>{{ about.license.tier }}</td></tr>
+            <tr><th>Клиент</th><td>{{ about.license.customer|default:"—" }}</td></tr>
+            <tr><th>Действует до</th><td>{{ about.license.expires_at|default:"бессрочно" }}</td></tr>
+            <tr><th>Лимит нод</th><td>{{ about.system_status.max_nodes }}</td></tr>
+        </tbody>
+    </table>
+
+    <p style="margin-top:20px">
+        <a href="{% url 'dashboard:eula' %}">Лицензионное соглашение (EULA) →</a>
+    </p>
+</div>
+{% endblock %}

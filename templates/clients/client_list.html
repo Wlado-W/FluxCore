@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Клиенты" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Клиенты" %}</h2>
+    <a href="{% url 'dashboard:client-create' %}" class="btn-primary">+ {% trans "Добавить клиента" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Имя" %}</th>
+            <th>{% trans "Владелец" %}</th>
+            <th>{% trans "Группа" %}</th>
+            <th>{% trans "Трафик" %}</th>
+            <th>{% trans "Истекает" %}</th>
+            <th>{% trans "Статус" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.name }}</td>
+            <td>{{ client.owner.username }}</td>
+            <td>{{ client.group.name }}</td>
+            <td>
+                {{ client.traffic_used_bytes|filesizeformat }}
+                {% if client.traffic_limit_bytes %} / {{ client.traffic_limit_bytes|filesizeformat }}{% else %} / ∞{% endif %}
+            </td>
+            <td>{{ client.expires_at|default:"—" }}</td>
+            <td>
+                {% if client.is_expired %}
+                    <span class="node-status-badge status-error">{% trans "Истёк" %}</span>
+                {% elif not client.is_active %}
+                    <span class="node-status-badge status-offline">{% trans "Неактивен" %}</span>
+                {% elif client.is_over_limit %}
+                    <span class="node-status-badge status-error">{% trans "Лимит исчерпан" %}</span>
+                {% else %}
+                    <span class="node-status-badge status-online">{% trans "Активен" %}</span>
+                {% endif %}
+                {% if client.is_trial %}<span class="fc-help-text">({% trans "пробный" %})</span>{% endif %}
+            </td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:client-edit' client.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:client-delete' client.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">{% trans "Клиентов пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

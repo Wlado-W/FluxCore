@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Реселлерские профили" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Реселлерские профили" %}</h2>
+    <a href="{% url 'dashboard:resellerprofile-create' %}" class="btn-primary">+ {% trans "Добавить профиль" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Пользователь" %}</th>
+            <th>{% trans "Комиссия" %}</th>
+            <th>{% trans "Одобрен" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for profile in profiles %}
+        <tr>
+            <td>{{ profile.user.username }}</td>
+            <td>{{ profile.commission_percent }}%</td>
+            <td>
+                {% if profile.is_approved %}
+                    <span class="node-status-badge status-online">{% trans "Да" %}</span>
+                {% else %}
+                    <form method="post" action="{% url 'dashboard:resellerprofile-approve' profile.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-secondary">{% trans "Одобрить" %}</button>
+                    </form>
+                {% endif %}
+            </td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:resellerprofile-edit' profile.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:resellerprofile-delete' profile.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state">{% trans "Профилей пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

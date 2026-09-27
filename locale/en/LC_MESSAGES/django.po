@@ -1,0 +1,96 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: FluxCore\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "Дашборд"
+msgstr "Dashboard"
+
+msgid "Инфраструктура"
+msgstr "Infrastructure"
+
+msgid "Ноды"
+msgstr "Nodes"
+
+msgid "Входящие"
+msgstr "Inbounds"
+
+msgid "Исходящие"
+msgstr "Outbounds"
+
+msgid "Каскадные серверы"
+msgstr "Cascade servers"
+
+msgid "Маршрутизация"
+msgstr "Routing"
+
+msgid "Клиенты"
+msgstr "Clients"
+
+msgid "Группы клиентов"
+msgstr "Client groups"
+
+msgid "Тарифы и биллинг"
+msgstr "Tariffs & billing"
+
+msgid "Мониторинг"
+msgstr "Monitoring"
+
+msgid "Карта нод"
+msgstr "Node map"
+
+msgid "Аудит-лог"
+msgstr "Audit log"
+
+msgid "Настройки"
+msgstr "Settings"
+
+msgid "Лицензия"
+msgstr "License"
+
+msgid "Темы оформления"
+msgstr "Themes"
+
+msgid "Безопасность (2FA)"
+msgstr "Security (2FA)"
+
+msgid "Полная админка"
+msgstr "Full admin"
+
+msgid "Выйти"
+msgstr "Log out"
+
+msgid "Статус"
+msgstr "Status"
+
+msgid "Действительна"
+msgstr "Valid"
+
+msgid "Недействительна"
+msgstr "Invalid"
+
+msgid "Клиент"
+msgstr "Customer"
+
+msgid "Лимит нод"
+msgstr "Node limit"
+
+msgid "Выдана"
+msgstr "Issued"
+
+msgid "Истекает"
+msgstr "Expires"
+
+msgid "бессрочно"
+msgstr "unlimited"
+
+msgid "Лицензия ещё не активирована."
+msgstr "No license activated yet."
+
+msgid "Активировать новую лицензию"
+msgstr "Activate a new license"
+
+msgid "Активировать"
+msgstr "Activate"

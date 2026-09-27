@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Лицензия" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Лицензия" %}</h2>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if token %}
+<div class="card fc-license-card">
+    <div class="card-label">{% trans "Токен активации" %}</div>
+    <div class="card-value {% if token_is_valid %}text-online{% else %}text-error{% endif %}">
+        {% if token_is_valid %}{% trans "Действителен" %}{% else %}{% trans "Истёк" %}{% endif %}
+    </div>
+    <table class="fc-kv-table">
+        <tr><td>{% trans "Лимит нод" %}</td><td>{{ token.max_nodes|default:"∞" }}</td></tr>
+        <tr><td>{% trans "Выдан" %}</td><td>{{ token.issued_at }}</td></tr>
+        <tr><td>{% trans "Истекает" %}</td><td>{{ token.expires_at }}</td></tr>
+    </table>
+    <p class="fc-help-text">{% trans "Токен продлевается автоматически раз в 12 часов, пока сервер лицензий продавца доступен." %}</p>
+</div>
+{% else %}
+<p class="fc-help-text">{% trans "Лицензия ещё не активирована." %}</p>
+{% endif %}
+
+<div class="form-box" style="margin-top: 24px;">
+    <h2>{% trans "Активировать лицензию" %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="fc-field">
+            <label>{{ form.license_key.label }}</label>
+            {{ form.license_key }}
+            {% if form.license_key.errors %}<p class="auth-error">{{ form.license_key.errors|striptags }}</p>{% endif %}
+        </div>
+        <button type="submit" class="btn-primary">{% trans "Активировать" %}</button>
+    </form>
+</div>
+{% endblock %}

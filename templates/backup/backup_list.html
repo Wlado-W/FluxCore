@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Резервные копии — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Резервные копии</h2>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="form-box">
+    <h3>Создать новый бэкап</h3>
+    <p class="fc-help-text">
+        Архив включает дамп базы данных (pg_dump), файл .env, загруженные файлы
+        (media) и сертификаты (certs), если они есть. Пароль шифрования нигде не
+        сохраняется — если вы его потеряете, восстановить архив будет невозможно.
+    </p>
+    <form method="post" action="{% url 'dashboard:backup-create' %}">
+        {% csrf_token %}
+        <div class="fc-field">
+            <label for="id_password">Пароль шифрования (необязательно, но настоятельно рекомендуется)</label>
+            <input type="password" id="id_password" name="password" class="fc-input" minlength="8"
+                   placeholder="Оставьте пустым для бэкапа без шифрования">
+        </div>
+        <button type="submit" class="btn-primary">Создать бэкап</button>
+    </form>
+</div>
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>Файл</th>
+            <th>Размер</th>
+            <th>Шифрование</th>
+            <th>Статус</th>
+            <th>Создан</th>
+            <th>Автор</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for backup in backups %}
+        <tr>
+            <td>{{ backup.file_name|default:"—" }}</td>
+            <td>{% if backup.file_size %}{{ backup.file_size|filesizeformat }}{% else %}—{% endif %}</td>
+            <td>{% if backup.is_encrypted %}🔒 да{% else %}открытый{% endif %}</td>
+            <td>{{ backup.get_status_display }}{% if backup.error_message %} — <span class="fc-help-text">{{ backup.error_message }}</span>{% endif %}</td>
+            <td>{{ backup.created_at }}</td>
+            <td>{{ backup.created_by.username|default:"—" }}</td>
+            <td class="fc-table-actions">
+                {% if backup.status == "completed" %}
+                    <a href="{% url 'dashboard:backup-download' backup.pk %}">Скачать</a>
+
+                    <form method="post" action="{% url 'dashboard:backup-restore' backup.pk %}" style="display:inline"
+                          onsubmit="return confirm('Восстановление ПЕРЕЗАПИШЕТ текущую базу данных. Продолжить?');">
+                        {% csrf_token %}
+                        {% if backup.is_encrypted %}
+                        <input type="password" name="password" placeholder="Пароль" class="fc-input" style="width:120px;display:inline-block" required>
+                        {% endif %}
+                        <input type="hidden" name="confirm" value="1">
+                        <button type="submit" class="btn-secondary">Восстановить</button>
+                    </form>
+                {% endif %}
+
+                <form method="post" action="{% url 'dashboard:backup-delete' backup.pk %}" style="display:inline"
+                      onsubmit="return confirm('Удалить этот бэкап безвозвратно?');">
+                    {% csrf_token %}
+                    <button type="submit" class="danger-link" style="background:none;border:none;cursor:pointer;">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">Бэкапов пока нет.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

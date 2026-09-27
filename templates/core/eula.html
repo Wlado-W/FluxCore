@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Лицензионное соглашение — {{ branding.app_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Лицензионное соглашение (EULA)</h2>
+</div>
+
+<div class="form-box">
+    <pre style="white-space:pre-wrap; font-family:inherit; line-height:1.6;">{{ eula_text }}</pre>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} — {% trans "Ваша подписка" %}</title>
+    <style>
+        :root { --bg:#0f1420; --surface:#171d2c; --border:#262e42; --text:#e6e9f0; --text-muted:#8891a7; --accent:#4f7cff; }
+        * { box-sizing: border-box; }
+        body { margin:0; padding:24px 16px; background:var(--bg); color:var(--text); font-family:-apple-system,Segoe UI,Roboto,sans-serif; display:flex; justify-content:center; }
+        .fc-card { width:100%; max-width:420px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; text-align:center; }
+        h1 { font-size:18px; margin:0 0 16px; }
+        .fc-qr { width:220px; height:220px; margin:0 auto 16px; border-radius:12px; overflow:hidden; background:#fff; }
+        .fc-qr img { width:100%; height:100%; display:block; }
+        .fc-buttons { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+        .fc-btn { display:block; padding:12px; border-radius:10px; background:var(--accent); color:#fff; text-decoration:none; font-weight:600; }
+        .fc-btn.secondary { background:transparent; border:1px solid var(--border); color:var(--text); }
+        .fc-ad { margin-top:20px; padding:14px; border-radius:12px; border:1px dashed var(--border); text-align:left; font-size:14px; color:var(--text-muted); }
+        .fc-ad a { color:var(--accent); }
+        .fc-footer { margin-top:20px; font-size:12px; color:var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="fc-card">
+        <h1>{{ app_name }} — {% trans "Ваша подписка" %}</h1>
+
+        <div class="fc-qr">
+            <img src="{% url 'subscriptions_public:subscription_qr' subscription.token %}" alt="QR">
+        </div>
+
+        <div class="fc-buttons">
+            <a class="fc-btn" href="{{ deep_links.happ }}">{% trans "Открыть в Happ" %}</a>
+            <a class="fc-btn secondary" href="{{ deep_links.v2rayng }}">{% trans "Открыть в v2rayNG" %}</a>
+            <a class="fc-btn secondary" href="{{ deep_links.hiddify }}">{% trans "Открыть в Hiddify" %}</a>
+            <a class="fc-btn secondary" href="{{ subscription_url }}">{% trans "Скопировать ссылку подписки" %}</a>
+        </div>
+
+        {% if ad %}
+        <div class="fc-ad">
+            {% if ad.title %}<strong>{{ ad.title }}</strong><br>{% endif %}
+            {{ ad.content|safe }}
+            {% if ad.link %}<br><a href="{{ ad.link }}" target="_blank" rel="noopener">{% trans "Подробнее" %} →</a>{% endif %}
+        </div>
+        {% endif %}
+
+        <div class="fc-footer">{{ app_name }}</div>
+    </div>
+</body>
+</html>

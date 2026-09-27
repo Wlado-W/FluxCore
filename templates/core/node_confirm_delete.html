@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Удалить ноду — FluxCore{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>Удалить ноду «{{ node.name }}»?</h2>
+    <p class="fc-help-text">Это действие необратимо. Все inbound'ы, outbound'ы и правила маршрутизации этой ноды тоже будут удалены.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">Да, удалить</button>
+            <a href="{% url 'dashboard:node-list' %}" class="btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

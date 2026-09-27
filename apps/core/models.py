@@ -60,8 +60,11 @@ class Node(models.Model):
     )
 
     country_code = models.CharField(max_length=2, blank=True, help_text="ISO 3166-1 alpha-2, для гео на карте")
+    city = models.CharField(max_length=100, blank=True, help_text="Определяется автоматически по IP (GeoIP)")
+    isp = models.CharField(max_length=255, blank=True, verbose_name="Провайдер (ISP)", help_text="Определяется автоматически по IP (GeoIP)")
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    geo_resolved_at = models.DateTimeField(null=True, blank=True, help_text="Когда гео-данные последний раз обновлялись")
 
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.PENDING)
     last_seen_at = models.DateTimeField(null=True, blank=True)

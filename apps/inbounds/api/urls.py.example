@@ -1,0 +1,16 @@
+"""
+Пример: если apps/inbounds/api/urls.py ещё пустая заглушка — замени
+целиком на это. Если там уже есть router с InboundViewSet — просто
+добавь строку с InboundTestConnectionView в urlpatterns ДО router.urls
+(иначе router может перехватить путь раньше).
+"""
+from django.urls import path
+
+from .test_view import InboundTestConnectionView
+
+app_name = "inbounds"
+
+urlpatterns = [
+    path("<int:pk>/test/", InboundTestConnectionView.as_view(), name="inbound-test"),
+    # ... остальные маршруты (router.urls с InboundViewSet, если уже есть)
+]

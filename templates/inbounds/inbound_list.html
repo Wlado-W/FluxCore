@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Входящие" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Входящие (Inbounds)" %}</h2>
+    <a href="{% url 'dashboard:inbound-create' %}" class="btn-primary">+ {% trans "Добавить inbound" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Тег" %}</th>
+            <th>{% trans "Нода" %}</th>
+            <th>{% trans "Протокол" %}</th>
+            <th>{% trans "Порт" %}</th>
+            <th>{% trans "Транспорт" %}</th>
+            <th>{% trans "Безопасность" %}</th>
+            <th>{% trans "Активен" %}</th>
+            <th>{% trans "Тест" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inbound in inbounds %}
+        <tr>
+            <td>{{ inbound.tag }}</td>
+            <td>{{ inbound.node.name }}</td>
+            <td>{{ inbound.get_protocol_display }}</td>
+            <td>{{ inbound.port }}</td>
+            <td>{{ inbound.get_transport_display }}</td>
+            <td>{{ inbound.get_security_display }}</td>
+            <td>{% if inbound.is_active %}✅{% else %}—{% endif %}</td>
+            <td>
+                <button type="button" class="btn-secondary btn-test" data-inbound-id="{{ inbound.pk }}" data-test-url="{% url 'dashboard:inbound-test' inbound.pk %}">
+                    {% trans "Проверить" %}
+                </button>
+                <span class="test-result" id="test-result-{{ inbound.pk }}"></span>
+            </td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:inbound-edit' inbound.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:inbound-delete' inbound.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="empty-state">{% trans "Инбаундов пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+
+document.querySelectorAll('.btn-test').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+        const resultEl = document.getElementById('test-result-' + btn.dataset.inboundId);
+        resultEl.textContent = '{% trans "Проверка..." %}';
+        resultEl.className = 'test-result';
+
+        try {
+            const response = await fetch(btn.dataset.testUrl, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+            });
+            const data = await response.json();
+            if (data.success) {
+                resultEl.textContent = `✅ ${data.latency_ms} ms`;
+                resultEl.className = 'test-result test-success';
+            } else {
+                resultEl.textContent = `❌ ${data.error}`;
+                resultEl.className = 'test-result test-error';
+            }
+        } catch (e) {
+            resultEl.textContent = '{% trans "Ошибка запроса" %}';
+            resultEl.className = 'test-result test-error';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Каскадные серверы" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Каскадные серверы (группы нод)" %}</h2>
+    <a href="{% url 'dashboard:nodegroup-create' %}" class="btn-primary">+ {% trans "Добавить группу" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Название" %}</th>
+            <th>{% trans "Каскад" %}</th>
+            <th>{% trans "Ноды в группе" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>{% if group.is_cascade %}⛓ {% trans "Да" %}{% else %}—{% endif %}</td>
+            <td>
+                {% for node in group.nodes.all %}
+                    <span class="node-status-badge status-{{ node.status }}">{{ node.name }}</span>
+                {% empty %}
+                    <span class="fc-help-text">{% trans "Нод пока нет" %}</span>
+                {% endfor %}
+            </td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:nodegroup-edit' group.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:nodegroup-delete' group.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state">{% trans "Групп пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

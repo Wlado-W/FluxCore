@@ -3,6 +3,7 @@ inbounds app — models.
 """
 import uuid
 
+from apps.core.fields import EncryptedJSONField
 from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -57,7 +58,7 @@ class Inbound(models.Model):
     transport_settings = models.JSONField(default=dict, blank=True, help_text="path, host, service_name и т.п.")
 
     security = models.CharField(max_length=16, choices=SecurityType.choices, default=SecurityType.NONE)
-    security_settings = models.JSONField(
+    security_settings = EncryptedJSONField(
         default=dict, blank=True,
         help_text="Для TLS: сертификаты/ключи. Для Reality: dest, private_key, short_ids, server_names",
     )

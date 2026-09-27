@@ -1,0 +1,10 @@
+# Один раз, только у тебя (продавца):
+python manage.py generate_keypair
+# → LICENSING_PRIVATE_KEY (храни в секрете) + LICENSING_PUBLIC_KEY (можно раздавать)
+
+# На каждую продажу:
+python manage.py generate_license --customer "ООО Ромашка" --max-nodes 5 --days 365
+# → готовый лицензионный ключ, отправляешь клиенту
+
+# У клиента (self-hosted, в .env уже стоит твой LICENSING_PUBLIC_KEY):
+python manage.py activate_license <ключ>

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Пользователи" %} — FluxCore{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% trans "Пользователи" %}</h2>
+    <a href="{% url 'dashboard:user-create' %}" class="btn-primary">+ {% trans "Добавить пользователя" %}</a>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<table class="fc-table">
+    <thead>
+        <tr>
+            <th>{% trans "Логин" %}</th>
+            <th>Email</th>
+            <th>{% trans "Роль" %}</th>
+            <th>{% trans "Баланс" %}</th>
+            <th>{% trans "Реселлер" %}</th>
+            <th>{% trans "Активен" %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email|default:"—" }}</td>
+            <td>{{ u.get_role_display }}</td>
+            <td>{{ u.balance }}</td>
+            <td>{{ u.parent_reseller.username|default:"—" }}</td>
+            <td>{% if u.is_active %}✅{% else %}—{% endif %}</td>
+            <td class="fc-table-actions">
+                <a href="{% url 'dashboard:user-edit' u.pk %}">{% trans "Изменить" %}</a>
+                <a href="{% url 'dashboard:user-delete' u.pk %}" class="danger-link">{% trans "Удалить" %}</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">{% trans "Пользователей пока нет." %}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
